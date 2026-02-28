@@ -1,0 +1,40 @@
+# IntelliJ / Android Studio
+*.iml
+.idea/
+.idea/caches/
+.idea/libraries/
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+
+# Gradle
+.gradle/
+build/
+**/build/
+
+# Local configuration
+local.properties
+
+# Android generated
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Outputs (opcional, mas recomendado)
+*.apk
+*.aab
+
+# Memory dumps (opcional)
+*.hprof
+
+# Keystores (NUNCA subir)
+*.jks
+*.keystore

@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Hidrate-se+</string>
+
+    <string name="email">Email</string>
+    <string name="password">Senha</string>
+    <string name="enter">Entrar</string>
+
+    <string name="today_total">Total do dia</string>
+    <string name="daily_goal">Meta diária</string>
+    <string name="add_250">+250 ml</string>
+    <string name="add_500">+500 ml</string>
+    <string name="undo">Desfazer</string>
+
+    <string name="history">Histórico</string>
+    <string name="settings">Configurações</string>
+
+    <string name="goal_ml">Meta (ml)</string>
+    <string name="enable_reminders">Ativar lembretes</string>
+    <string name="save">Salvar</string>
+</resources>

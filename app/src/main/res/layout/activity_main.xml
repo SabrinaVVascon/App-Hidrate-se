@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/space_lg"
+    android:background="@color/bg">
+
+    <TextView
+        android:id="@+id/tvHeader"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Hoje"
+        android:textSize="@dimen/text_title"
+        android:textStyle="bold"
+        android:textColor="@color/text"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/topActions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="@id/tvHeader"
+        app:layout_constraintBottom_toBottomOf="@id/tvHeader"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageButton
+            android:id="@+id/btnHistory"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_card"
+            android:contentDescription="@string/history"
+            android:padding="8dp"
+            android:src="@drawable/ic_history"
+            android:tint="@color/brand" />
+
+        <ImageButton
+            android:id="@+id/btnSettings"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="@dimen/space_sm"
+            android:background="@drawable/bg_card"
+            android:contentDescription="@string/settings"
+            android:padding="8dp"
+            android:src="@drawable/ic_settings"
+            android:tint="@color/brand" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/cardToday"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_lg"
+        android:background="@drawable/bg_card"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/tvHeader"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_water"
+                android:tint="@color/brand"
+                android:contentDescription="Ícone água" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/space_sm"
+                android:text="@string/today_total"
+                android:textColor="@color/text_muted"
+                android:textSize="@dimen/text_subtitle" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvTotal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_sm"
+            android:text="750 ml"
+            android:textSize="34sp"
+            android:textStyle="bold"
+            android:textColor="@color/text" />
+
+        <ProgressBar
+            android:id="@+id/progressGoal"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:layout_marginTop="@dimen/space_sm"
+            android:max="2000"
+            android:progress="750"
+            android:progressTint="@color/brand"
+            android:progressBackgroundTint="@color/brand_soft" />
+
+        <TextView
+            android:id="@+id/tvGoal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_sm"
+            android:text="Meta diária: 2000 ml"
+            android:textColor="@color/text_muted"
+            android:textSize="@dimen/text_subtitle" />
+    </LinearLayout>
+
+    <!-- QUADRINHO ÚNICO: adicionar + atalhos -->
+    <LinearLayout
+        android:id="@+id/actions"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_lg"
+        android:orientation="vertical"
+        android:background="@drawable/bg_card"
+        app:layout_constraintTop_toBottomOf="@id/cardToday"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Adicionar valor manual (primeiro) -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Adicionar valor (ml)"
+            android:textStyle="bold"
+            android:textColor="@color/text" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_sm"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/etCustomMl"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Ex: 180"
+                android:inputType="number"
+                android:padding="@dimen/space_md"
+                android:backgroundTint="@color/brand"
+                android:textColor="@color/text" />
+
+            <Button
+                android:id="@+id/btnAddCustom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/space_sm"
+                android:text="Adicionar" />
+        </LinearLayout>
+
+        <!-- divisor -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/space_md"
+            android:layout_marginBottom="@dimen/space_md"
+            android:background="@color/stroke" />
+
+        <!-- Atalhos (depois) -->
+        <Button
+            android:id="@+id/btnAdd250"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/add_250" />
+
+        <Button
+            android:id="@+id/btnAdd500"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_sm"
+            android:text="@string/add_500" />
+
+        <Button
+            android:id="@+id/btnUndo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_sm"
+            android:text="@string/undo" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
