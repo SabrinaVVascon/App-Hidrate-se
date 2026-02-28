@@ -1,4 +1,4 @@
-# Hidrate-se (Hydrate-se+) 💧📱
+# Hidrate-se + 💧📱
 
 Aplicativo Android para ajudar o usuário a acompanhar a ingestão diária de água, registrar consumos, visualizar histórico e ajustar metas/configurações.
 
