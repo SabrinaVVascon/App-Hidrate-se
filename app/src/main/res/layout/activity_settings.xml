@@ -1,78 +1,211 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/space_lg"
-    android:background="@color/bg">
-
-    <TextView
-        android:id="@+id/tvHeader"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/settings"
-        android:textSize="@dimen/text_title"
-        android:textStyle="bold"
-        android:textColor="@color/text"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+    android:fillViewport="true"
+    android:background="#F4F5F7">
 
     <LinearLayout
-        android:id="@+id/cardSettings"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/space_lg"
-        android:background="@drawable/bg_card"
         android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@id/tvHeader"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        android:padding="24dp">
 
         <TextView
-            android:layout_width="match_parent"
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/goal_ml"
+            android:text="Configurações"
+            android:textSize="28sp"
             android:textStyle="bold"
-            android:textColor="@color/text" />
-
-        <EditText
-            android:id="@+id/etGoal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_xs"
-            android:hint="Ex: 2000"
-            android:inputType="number"
-            android:padding="@dimen/space_md"
-            android:backgroundTint="@color/brand"
-            android:textColor="@color/text" />
+            android:textColor="#1F2937"
+            android:layout_marginBottom="24dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_md"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:background="@android:color/white">
 
-            <TextView
-                android:layout_width="0dp"
+            <!-- META CALCULADA -->
+            <LinearLayout
+                android:id="@+id/headerCalculatedGoal"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/enable_reminders"
-                android:textColor="@color/text" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingVertical="8dp">
 
-            <Switch
-                android:id="@+id/swReminders"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Meta calculada"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="#111827" />
+
+                <TextView
+                    android:id="@+id/tvToggleCalculated"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="+"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:textColor="#2563EB" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutCalculatedGoal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:paddingTop="8dp"
+                android:paddingBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Peso (kg)"
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    android:textColor="#111827" />
+
+                <EditText
+                    android:id="@+id/etWeight"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Ex.: 60"
+                    android:inputType="numberDecimal"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="16dp" />
+
+                <Button
+                    android:id="@+id/btnCalculateGoal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Calcular meta"
+                    android:layout_marginBottom="12dp" />
+
+                <TextView
+                    android:id="@+id/tvCalculatedGoal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Meta diária (ml): --"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#2563EB" />
+            </LinearLayout>
+
+            <!-- META MANUAL -->
+            <LinearLayout
+                android:id="@+id/headerManualGoal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingVertical="8dp"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Meta manual"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="#111827" />
+
+                <TextView
+                    android:id="@+id/tvToggleManual"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="+"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:textColor="#2563EB" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutManualGoal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:paddingTop="8dp"
+                android:paddingBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Meta manual (ml)"
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    android:textColor="#111827" />
+
+                <EditText
+                    android:id="@+id/etGoal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Ex.: 2000"
+                    android:inputType="number"
+                    android:layout_marginTop="8dp" />
+            </LinearLayout>
+
+            <!-- LEMBRETES -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Receber lembretes"
+                    android:textSize="16sp"
+                    android:textColor="#111827" />
+
+                <Switch
+                    android:id="@+id/switchReminder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutFrequency"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Frequência dos lembretes"
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    android:textColor="#111827"
+                    android:layout_marginBottom="8dp" />
+
+                <Spinner
+                    android:id="@+id/spinnerFrequency"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="24dp" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnSave"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Salvar" />
+
         </LinearLayout>
-
-        <Button
-            android:id="@+id/btnSave"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_md"
-            android:text="@string/save" />
     </LinearLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
