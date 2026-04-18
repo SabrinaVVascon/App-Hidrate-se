@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -48,4 +49,9 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    // Room - banco de dados local (Taynara)
+    implementation("androidx.room:room-runtime:2.6.1") // ← adicione
+    implementation("androidx.room:room-ktx:2.6.1")     // ← adicione
+    ksp("androidx.room:room-compiler:2.6.1")
 }
