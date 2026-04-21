@@ -13,4 +13,10 @@ interface WaterDao {
 
     @Query("SELECT COALESCE(SUM(amount), 0) FROM water WHERE date = :today")
     suspend fun getTodayTotal(today: String): Int
+
+    @Query("SELECT * FROM water WHERE date = :today ORDER BY id DESC LIMIT 1")
+    suspend fun getLastEntry(today: String): WaterEntryEntity?
+
+    @Query("DELETE FROM water WHERE id = :id")
+    suspend fun deleteById(id: Int)
 }

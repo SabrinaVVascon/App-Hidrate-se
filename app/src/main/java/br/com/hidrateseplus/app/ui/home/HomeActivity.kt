@@ -3,30 +3,38 @@ package br.com.hidrateseplus.app.ui.home
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import br.com.hidrateseplus.app.databinding.ActivityMainBinding
 import br.com.hidrateseplus.app.ui.history.HistoryActivity
 import br.com.hidrateseplus.app.ui.settings.SettingsActivity
+import br.com.hidrateseplus.data.local.AppDatabase
+import br.com.hidrateseplus.data.local.WaterDao
+import br.com.hidrateseplus.data.local.WaterEntryEntity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var waterDao: WaterDao
 
-    // Valores “em memória” (sem persistência)
-    private var totalMl = 750
+    private var totalMl = 0
     private var goalMl = 2000
-
-    // Guarda o último valor adicionado pra desfazer corretamente
-    private var lastAddedMl = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Atualiza a tela com os valores iniciais
-        updateUI()
+        waterDao = AppDatabase.getDatabase(this).waterDao()
 
-        // Navegação
+        updateUI()
+        loadHomeData()
+
         binding.btnHistory.setOnClickListener {
             startActivity(Intent(this, HistoryActivity::class.java))
         }
@@ -35,7 +43,6 @@ class HomeActivity : AppCompatActivity() {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
 
-        // Atalhos
         binding.btnAdd250.setOnClickListener {
             addWater(250)
         }
@@ -44,7 +51,6 @@ class HomeActivity : AppCompatActivity() {
             addWater(500)
         }
 
-        // Adicionar valor manual
         binding.btnAddCustom.setOnClickListener {
             val value = binding.etCustomMl.text.toString().trim().toIntOrNull()
 
@@ -56,26 +62,79 @@ class HomeActivity : AppCompatActivity() {
             }
         }
 
-        // Desfazer (remove o último valor adicionado)
         binding.btnUndo.setOnClickListener {
-            if (lastAddedMl > 0) {
-                totalMl = (totalMl - lastAddedMl).coerceAtLeast(0)
-                lastAddedMl = 0
-                updateUI()
+            undoLastEntry()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadHomeData()
+    }
+
+    private fun loadHomeData() {
+        lifecycleScope.launch {
+            goalMl = getSavedGoal()
+
+            totalMl = withContext(Dispatchers.IO) {
+                waterDao.getTodayTotal(getTodayDate())
             }
+
+            updateUI()
         }
     }
 
     private fun addWater(ml: Int) {
-        lastAddedMl = ml
-        totalMl += ml
-        updateUI()
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                waterDao.insert(
+                    WaterEntryEntity(
+                        amount = ml,
+                        date = getTodayDate()
+                    )
+                )
+            }
+
+            loadHomeData()
+        }
+    }
+
+    private fun undoLastEntry() {
+        lifecycleScope.launch {
+            val lastEntry = withContext(Dispatchers.IO) {
+                waterDao.getLastEntry(getTodayDate())
+            }
+
+            if (lastEntry != null) {
+                withContext(Dispatchers.IO) {
+                    waterDao.deleteById(lastEntry.id)
+                }
+
+                loadHomeData()
+            }
+        }
     }
 
     private fun updateUI() {
         binding.tvTotal.text = "${totalMl} ml"
-        binding.progressGoal.max = goalMl
-        binding.progressGoal.progress = totalMl.coerceAtMost(goalMl)
-        binding.tvGoal.text = "Meta diária: ${goalMl} ml"
+
+        val safeGoal = if (goalMl > 0) goalMl else 1
+        binding.progressGoal.max = safeGoal
+        binding.progressGoal.progress = totalMl.coerceAtMost(safeGoal)
+
+        binding.tvGoal.text = if (goalMl > 0) {
+            "Meta diária: ${goalMl} ml"
+        } else {
+            "Meta diária: --"
+        }
+    }
+
+    private fun getSavedGoal(): Int {
+        val prefs = getSharedPreferences("hydratese_prefs", MODE_PRIVATE)
+        return prefs.getInt("daily_goal_ml", 0)
+    }
+
+    private fun getTodayDate(): String {
+        return SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
     }
 }
