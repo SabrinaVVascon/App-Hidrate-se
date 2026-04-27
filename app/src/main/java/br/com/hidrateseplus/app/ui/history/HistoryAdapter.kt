@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import br.com.hidrateseplus.app.databinding.ItemHistoryDayBinding
+import br.com.hidrateseplus.data.local.HistoryDay
 
 class HistoryAdapter(
     private val items: List<HistoryDay>

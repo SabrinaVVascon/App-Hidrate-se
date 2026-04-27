@@ -1,4 +1,4 @@
-package br.com.hidrateseplus.app.ui.history
+package br.com.hidrateseplus.data.local
 
 data class HistoryDay(
     val date: String,
