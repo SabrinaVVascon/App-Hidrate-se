@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "735954808568",
+    "project_id": "hidrate-se-app",
+    "storage_bucket": "hidrate-se-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:735954808568:android:4768424de247417d2d150d",
+        "android_client_info": {
+          "package_name": "br.com.hidrateseplus.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApbsUtdhGVp_mQx4ShGr70JbgSXusgs6E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

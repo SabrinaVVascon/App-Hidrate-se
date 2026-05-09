@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.devtools.ksp")
+    id("com.google.gms.google-services")   // ← ESSA LINHA
 }
 
 android {
@@ -60,7 +61,12 @@ dependencies {
 
     implementation("androidx.work:work-runtime-ktx:2.11.2")
 
-    // ViewModel + by viewModels()
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
     implementation("androidx.activity:activity-ktx:1.10.1")
+
+    // ==================== FIREBASE ====================
+    implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
+    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-auth-ktx")        // para login futuro
+    // ==================================================
 }

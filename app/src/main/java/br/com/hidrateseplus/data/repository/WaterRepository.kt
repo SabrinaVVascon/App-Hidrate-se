@@ -4,11 +4,6 @@ import br.com.hidrateseplus.data.local.HistoryDay
 import br.com.hidrateseplus.data.local.LocalDataSource
 import br.com.hidrateseplus.data.remote.RemoteDataSource
 
-// ============================================================
-// PADRÃO: Repository + Proxy
-// Única fonte de verdade para todas as telas do app.
-// ============================================================
-
 sealed class WaterError {
     object NetworkError : WaterError()
     object ServerError : WaterError()
@@ -25,17 +20,19 @@ class WaterRepository(
     private val remoteDataSource: RemoteDataSource
 ) {
 
-    // Salva localmente SEMPRE; tenta enviar remotamente (best-effort)
     suspend fun addWater(amount: Int): Result<Unit> {
         return try {
+            // Sempre salva localmente primeiro (Offline-First)
             localDataSource.save(amount)
+
+            // Tenta sincronizar com Firebase (não quebra se falhar)
             try {
                 remoteDataSource.send(amount)
-            } catch (e: retrofit2.HttpException) {
-                android.util.Log.w("WaterRepository", "Sync remoto falhou: ${e.code()} ${e.message()}")
-            } catch (e: java.io.IOException) {
-                android.util.Log.w("WaterRepository", "Sem rede ao sincronizar: ${e.message}")
+            } catch (e: Exception) {
+                android.util.Log.w("WaterRepository", "Sync com Firestore falhou (offline ok)", e)
+                // Não propaga o erro - app continua funcionando
             }
+
             Result.Success(Unit)
         } catch (e: Exception) {
             android.util.Log.e("WaterRepository", "Erro ao salvar localmente", e)
@@ -43,7 +40,6 @@ class WaterRepository(
         }
     }
 
-    // Busca total do dia
     suspend fun getTodayTotal(): Result<Int> {
         return try {
             Result.Success(localDataSource.getTodayTotal())
@@ -53,7 +49,6 @@ class WaterRepository(
         }
     }
 
-    // Desfaz último registro do dia
     suspend fun undoLastEntry(): Result<Unit> {
         return try {
             localDataSource.deleteLastEntry()
@@ -64,7 +59,6 @@ class WaterRepository(
         }
     }
 
-    // Busca histórico agrupado por dia — usado pela HistoryActivity
     suspend fun getHistory(): Result<List<HistoryDay>> {
         return try {
             val items = localDataSource.getHistory()

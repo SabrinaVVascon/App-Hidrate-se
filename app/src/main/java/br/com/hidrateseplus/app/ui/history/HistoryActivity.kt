@@ -9,7 +9,6 @@ import br.com.hidrateseplus.app.databinding.ActivityHistoryBinding
 import br.com.hidrateseplus.data.local.AppDatabase
 import br.com.hidrateseplus.data.local.LocalDataSource
 import br.com.hidrateseplus.data.remote.RemoteDataSource
-import br.com.hidrateseplus.data.remote.RetrofitClient
 import br.com.hidrateseplus.data.repository.WaterRepository
 
 // ============================================================
@@ -51,7 +50,7 @@ class HistoryActivity : AppCompatActivity() {
     private fun buildRepository(): WaterRepository {
         val db = AppDatabase.getDatabase(this)
         val localDataSource = LocalDataSource(db.waterDao())
-        val remoteDataSource = RemoteDataSource(RetrofitClient.apiService)
+        val remoteDataSource = RemoteDataSource()
         return WaterRepository(localDataSource, remoteDataSource)
     }
 }
