@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import br.com.hidrateseplus.data.repository.Result
 import br.com.hidrateseplus.data.repository.WaterError
 import br.com.hidrateseplus.data.repository.WaterRepository
+import br.com.hidrateseplus.util.ValidationUtils
 import kotlinx.coroutines.launch
 
 // ============================================================
@@ -64,8 +65,12 @@ class HomeViewModel(
 
     // Adiciona água — chamado pelos botões na Activity
     fun addWater(amount: Int) {
-        if (amount <= 0) {
-            _snackbarMessage.value = "Digite um valor válido"
+        if (!ValidationUtils.isWaterAmountValid(amount)) {
+            _snackbarMessage.value = when {
+                amount <= 0 -> "O valor deve ser maior que 0"
+                amount > 5000 -> "O valor não pode ser maior que 5000 ml"
+                else -> "Digite um valor válido"
+            }
             return
         }
 

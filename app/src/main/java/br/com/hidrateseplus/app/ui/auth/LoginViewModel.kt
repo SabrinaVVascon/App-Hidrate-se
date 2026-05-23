@@ -3,6 +3,8 @@ package br.com.hidrateseplus.app.ui.auth
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import br.com.hidrateseplus.data.remote.AuthRemoteDataSource
+import br.com.hidrateseplus.data.repository.UserRepository
 
 // ============================================================
 // MVVM — ViewModel da tela de Login
@@ -11,17 +13,31 @@ import androidx.lifecycle.ViewModel
 // ============================================================
 class LoginViewModel : ViewModel() {
 
-    // Evento único de navegação — true = navegar para Home
+    private val userRepository = UserRepository(AuthRemoteDataSource())
+
     private val _navigateToHome = MutableLiveData<Boolean>()
     val navigateToHome: LiveData<Boolean> = _navigateToHome
 
-    fun onEnterClicked() {
-        // Aqui futuramente pode ter validação, autenticação, etc.
+    private val _loginError = MutableLiveData<String?>()
+    val loginError: LiveData<String?> = _loginError
+
+    fun onEnterClicked(email: String, password: String) {
+        // Por enquanto mantém navegação direta; descomente o bloco abaixo quando a API estiver pronta:
+        // viewModelScope.launch {
+        //     when (val result = userRepository.login(email, password)) {
+        //         is Result.Success -> _navigateToHome.value = true
+        //         is Result.Error -> _loginError.value = result.message
+        //         is Result.Loading -> Unit
+        //     }
+        // }
         _navigateToHome.value = true
     }
 
-    // Chamado após a Activity consumir o evento de navegação
     fun onNavigationHandled() {
         _navigateToHome.value = false
+    }
+
+    fun onLoginErrorShown() {
+        _loginError.value = null
     }
 }

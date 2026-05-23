@@ -1,8 +1,10 @@
 package br.com.hidrateseplus.data.repository
 
+import android.util.Log
 import br.com.hidrateseplus.data.local.HistoryDay
 import br.com.hidrateseplus.data.local.LocalDataSource
 import br.com.hidrateseplus.data.remote.RemoteDataSource
+import kotlinx.coroutines.withTimeoutOrNull
 
 sealed class WaterError {
     object NetworkError : WaterError()
@@ -22,22 +24,29 @@ class WaterRepository(
 
     suspend fun addWater(amount: Int): Result<Unit> {
         return try {
-            // Sempre salva localmente primeiro (Offline-First)
+            Log.d(TAG, "Salvando localmente...")
             localDataSource.save(amount)
+            Log.d(TAG, "Salvo localmente com sucesso")
 
-            // Tenta sincronizar com Firebase (não quebra se falhar)
+            Log.d(TAG, "Tentando sync Firestore...")
             try {
-                remoteDataSource.send(amount)
+                withTimeoutOrNull(FIRESTORE_SYNC_TIMEOUT_MS) {
+                    remoteDataSource.send(amount)
+                } ?: Log.w(TAG, "Sync Firestore expirou (offline ok)")
             } catch (e: Exception) {
-                android.util.Log.w("WaterRepository", "Sync com Firestore falhou (offline ok)", e)
-                // Não propaga o erro - app continua funcionando
+                Log.w(TAG, "Sync com Firestore falhou (offline ok)", e)
             }
 
             Result.Success(Unit)
         } catch (e: Exception) {
-            android.util.Log.e("WaterRepository", "Erro ao salvar localmente", e)
+            Log.e(TAG, "Erro ao salvar localmente", e)
             Result.Failure(WaterError.Unknown(e.message))
         }
+    }
+
+    companion object {
+        private const val TAG = "WaterRepository"
+        private const val FIRESTORE_SYNC_TIMEOUT_MS = 5_000L
     }
 
     suspend fun getTodayTotal(): Result<Int> {
