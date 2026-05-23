@@ -10,7 +10,8 @@ import br.com.hidrateseplus.data.repository.WaterError   // Importante
 
 class RemoteDataSource {
 
-    private val firestore = FirebaseFirestore.getInstance()
+    // Lazy: só acessa o Firestore no primeiro envio, não na construção do repositório
+    private val firestore: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
     private val userId: String = "demo_user_123"   // Temporário
 
     suspend fun send(amount: Int): Result<Unit> {

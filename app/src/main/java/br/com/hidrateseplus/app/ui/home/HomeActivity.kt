@@ -12,6 +12,7 @@ import br.com.hidrateseplus.data.local.AppDatabase
 import br.com.hidrateseplus.data.local.LocalDataSource
 import br.com.hidrateseplus.data.remote.RemoteDataSource
 import br.com.hidrateseplus.data.repository.WaterRepository
+import br.com.hidrateseplus.util.ValidationUtils
 
 // ============================================================
 // MVVM — View (Activity)
@@ -92,13 +93,16 @@ class HomeActivity : AppCompatActivity() {
         }
 
         binding.btnAddCustom.setOnClickListener {
-            val value = binding.etCustomMl.text.toString().trim().toIntOrNull()
-            if (value != null && value > 0) {
-                viewModel.addWater(value)
-                binding.etCustomMl.text?.clear()
-            } else {
-                binding.etCustomMl.error = "Digite um valor válido"
+            val errorMessage = validateCustomWaterAmount()
+            if (errorMessage != null) {
+                binding.etCustomMl.error = errorMessage
+                return@setOnClickListener
             }
+
+            val value = binding.etCustomMl.text.toString().trim().toInt()
+            viewModel.addWater(value)
+            binding.etCustomMl.text?.clear()
+            binding.etCustomMl.error = null
         }
 
         binding.btnUndo.setOnClickListener {
@@ -107,6 +111,32 @@ class HomeActivity : AppCompatActivity() {
     }
 
     // ── Helpers ──────────────────────────────────────────────────────
+
+    private fun validateCustomWaterAmount(): String? {
+        binding.etCustomMl.error = null
+        val text = binding.etCustomMl.text.toString().trim()
+
+        if (!ValidationUtils.isFieldNotEmpty(text)) {
+            return "Digite um valor"
+        }
+
+        val value = text.toIntOrNull()
+            ?: return "Digite um valor válido"
+
+        if (value <= 0) {
+            return "O valor deve ser maior que 0"
+        }
+
+        if (value > 5000) {
+            return "O valor não pode ser maior que 5000 ml"
+        }
+
+        if (!ValidationUtils.isWaterAmountValid(value)) {
+            return "Digite um valor válido"
+        }
+
+        return null
+    }
 
     private fun getSavedGoal(): Int {
         val prefs = getSharedPreferences("hydratese_prefs", MODE_PRIVATE)
