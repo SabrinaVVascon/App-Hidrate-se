@@ -7,7 +7,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import br.com.hidrateseplus.app.databinding.ActivityLoginBinding
 import br.com.hidrateseplus.app.ui.home.HomeActivity
-import br.com.hidrateseplus.util.ValidationUtils
+import br.com.hidrateseplus.app.util.ValidationUtils
 
 // ============================================================
 // MVVM — View da tela de Login
