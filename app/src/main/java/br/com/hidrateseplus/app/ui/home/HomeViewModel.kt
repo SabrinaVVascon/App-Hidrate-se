@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import br.com.hidrateseplus.data.repository.Result
 import br.com.hidrateseplus.data.repository.WaterError
 import br.com.hidrateseplus.data.repository.WaterRepository
-import br.com.hidrateseplus.util.ValidationUtils
+import br.com.hidrateseplus.app.util.ValidationUtils
 import kotlinx.coroutines.launch
 
 // ============================================================

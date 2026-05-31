@@ -43,7 +43,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     private val _event = MutableLiveData<SettingsEvent?>()
     val event: LiveData<SettingsEvent?> = _event
 
-    // Valor calculado internamente — não exposto direto à UI
+    // Valor calculado internamente
     private var calculatedGoalMl: Int? = null
     private var selectedGoalType: String? = null
 
@@ -62,19 +62,44 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         val frequencies = listOf("30 min", "1 hora", "2 horas", "3 horas")
         val freqIndex = frequencies.indexOf(savedFrequency).coerceAtLeast(0)
 
-        val manualGoalText = if (savedManualGoal > 0 && savedGoalType == GOAL_TYPE_MANUAL)
-            savedManualGoal.toString() else ""
+        selectedGoalType = savedGoalType
 
-        val calcText = if (savedCalculatedGoal > 0 && savedGoalType == GOAL_TYPE_CALCULATED)
-            "Meta diária (ml): $savedCalculatedGoal" else "Meta diária (ml): --"
+        calculatedGoalMl = if (
+            savedGoalType == GOAL_TYPE_CALCULATED &&
+            savedCalculatedGoal > 0
+        ) {
+            savedCalculatedGoal
+        } else {
+            null
+        }
 
-        if (savedGoalType == GOAL_TYPE_CALCULATED && savedCalculatedGoal > 0) {
-            calculatedGoalMl = savedCalculatedGoal
+        val manualGoalText = if (
+            savedGoalType == GOAL_TYPE_MANUAL &&
+            savedManualGoal > 0
+        ) {
+            savedManualGoal.toString()
+        } else {
+            ""
+        }
+
+        val weightText = if (savedGoalType == GOAL_TYPE_CALCULATED) {
+            savedCalculatedWeight
+        } else {
+            ""
+        }
+
+        val calcText = if (
+            savedGoalType == GOAL_TYPE_CALCULATED &&
+            savedCalculatedGoal > 0
+        ) {
+            "Meta diária (ml): $savedCalculatedGoal"
+        } else {
+            "Meta diária (ml): --"
         }
 
         _uiState.value = SettingsUiState(
             manualGoal = manualGoalText,
-            weight = savedCalculatedWeight,
+            weight = weightText,
             calculatedGoalText = calcText,
             remindersEnabled = remindersEnabled,
             selectedFrequencyIndex = freqIndex,
@@ -82,29 +107,53 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         )
     }
 
-    fun onManualGoalChanged() {
+    fun onManualGoalChanged(manualGoalText: String) {
         selectedGoalType = GOAL_TYPE_MANUAL
+        calculatedGoalMl = null
+
+        _uiState.value = _uiState.value?.copy(
+            manualGoal = manualGoalText,
+            weight = "",
+            calculatedGoalText = "Meta diária (ml): --",
+            goalType = GOAL_TYPE_MANUAL
+        )
     }
 
-    fun onWeightChanged() {
+    fun onWeightChanged(weightText: String) {
+        selectedGoalType = GOAL_TYPE_CALCULATED
         calculatedGoalMl = null
-        _uiState.value = _uiState.value?.copy(calculatedGoalText = "Meta diária (ml): --")
+
+        _uiState.value = _uiState.value?.copy(
+            manualGoal = "",
+            weight = weightText,
+            calculatedGoalText = "Meta diária (ml): --",
+            goalType = GOAL_TYPE_CALCULATED
+        )
     }
 
     fun onCalculateGoalClicked(weightText: String) {
-        if (weightText.isBlank()) {
+        val normalizedWeightText = weightText.trim().replace(",", ".")
+
+        if (normalizedWeightText.isBlank()) {
             _event.value = SettingsEvent.ShowToast("Digite o peso para calcular")
             return
         }
-        val weight = weightText.toDoubleOrNull()
+
+        val weight = normalizedWeightText.toDoubleOrNull()
+
         if (weight == null || weight <= 0) {
             _event.value = SettingsEvent.ShowToast("Peso inválido")
             return
         }
+
         calculatedGoalMl = (weight * 35).toInt()
         selectedGoalType = GOAL_TYPE_CALCULATED
+
         _uiState.value = _uiState.value?.copy(
-            calculatedGoalText = "Meta diária (ml): $calculatedGoalMl"
+            manualGoal = "",
+            weight = weightText,
+            calculatedGoalText = "Meta diária (ml): $calculatedGoalMl",
+            goalType = GOAL_TYPE_CALCULATED
         )
     }
 
@@ -127,6 +176,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
                 }
                 GOAL_TYPE_MANUAL
             }
+
             GOAL_TYPE_CALCULATED -> {
                 if (calculatedGoalMl == null || calculatedGoalMl!! <= 0) {
                     _event.value = SettingsEvent.ShowToast("Calcule a meta antes de salvar")
@@ -134,6 +184,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
                 }
                 GOAL_TYPE_CALCULATED
             }
+
             else -> currentGoalType
         }
 
@@ -143,18 +194,27 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             else -> currentGoalValue
         }
 
-        // Se está trocando o tipo de meta, mostra diálogo de confirmação
-        if (selectedGoalType != null && currentGoalType != null
-            && currentGoalType != goalTypeToSave && currentGoalValue > 0) {
+        if (
+            selectedGoalType != null &&
+            currentGoalType != null &&
+            currentGoalType != goalTypeToSave &&
+            currentGoalValue > 0
+        ) {
             _event.value = SettingsEvent.ShowOverwriteDialog(currentGoalType, goalValueToSave)
             return
         }
 
-        persistSettings(goalTypeToSave, goalValueToSave, manualGoal,
-            calculatedGoalMl, weightText, remindersEnabled, frequency)
+        persistSettings(
+            goalTypeToSave = goalTypeToSave,
+            goalValueToSave = goalValueToSave,
+            manualGoal = manualGoal,
+            calculatedGoal = calculatedGoalMl,
+            calculatedWeight = weightText,
+            remindersEnabled = remindersEnabled,
+            frequency = frequency
+        )
     }
 
-    // Chamado após o usuário confirmar o diálogo de substituição
     fun onOverwriteConfirmed(
         manualGoalText: String,
         weightText: String,
@@ -164,14 +224,24 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         val frequency = listOf("30 min", "1 hora", "2 horas", "3 horas")[frequencyIndex]
         val currentGoalValue = prefs.getInt(KEY_DAILY_GOAL_ML, 0)
         val manualGoal = manualGoalText.trim().toIntOrNull()
+
         val goalTypeToSave = selectedGoalType ?: prefs.getString(KEY_GOAL_TYPE, null)
+
         val goalValueToSave = when (goalTypeToSave) {
             GOAL_TYPE_MANUAL -> manualGoal ?: currentGoalValue
             GOAL_TYPE_CALCULATED -> calculatedGoalMl ?: currentGoalValue
             else -> currentGoalValue
         }
-        persistSettings(goalTypeToSave, goalValueToSave, manualGoal,
-            calculatedGoalMl, weightText, remindersEnabled, frequency)
+
+        persistSettings(
+            goalTypeToSave = goalTypeToSave,
+            goalValueToSave = goalValueToSave,
+            manualGoal = manualGoal,
+            calculatedGoal = calculatedGoalMl,
+            calculatedWeight = weightText,
+            remindersEnabled = remindersEnabled,
+            frequency = frequency
+        )
     }
 
     private fun persistSettings(
@@ -190,15 +260,21 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             .putString(KEY_REMINDER_FREQUENCY, frequency)
 
         when (goalTypeToSave) {
-            GOAL_TYPE_MANUAL -> editor
-                .putInt(KEY_MANUAL_GOAL_ML, manualGoal ?: 0)
-                .putInt(KEY_CALCULATED_GOAL_ML, 0)
-                .putString(KEY_CALCULATED_WEIGHT, "")
-            GOAL_TYPE_CALCULATED -> editor
-                .putInt(KEY_MANUAL_GOAL_ML, 0)
-                .putInt(KEY_CALCULATED_GOAL_ML, calculatedGoal ?: 0)
-                .putString(KEY_CALCULATED_WEIGHT, calculatedWeight)
+            GOAL_TYPE_MANUAL -> {
+                editor
+                    .putInt(KEY_MANUAL_GOAL_ML, manualGoal ?: 0)
+                    .putInt(KEY_CALCULATED_GOAL_ML, 0)
+                    .putString(KEY_CALCULATED_WEIGHT, "")
+            }
+
+            GOAL_TYPE_CALCULATED -> {
+                editor
+                    .putInt(KEY_MANUAL_GOAL_ML, 0)
+                    .putInt(KEY_CALCULATED_GOAL_ML, calculatedGoal ?: 0)
+                    .putString(KEY_CALCULATED_WEIGHT, calculatedWeight)
+            }
         }
+
         editor.apply()
 
         if (remindersEnabled) {
@@ -232,6 +308,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         const val KEY_CALCULATED_WEIGHT = "calculated_weight"
         const val KEY_REMINDERS_ENABLED = "reminders_enabled"
         const val KEY_REMINDER_FREQUENCY = "reminder_frequency"
+
         const val GOAL_TYPE_MANUAL = "manual"
         const val GOAL_TYPE_CALCULATED = "calculated"
     }

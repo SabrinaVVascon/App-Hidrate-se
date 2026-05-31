@@ -12,7 +12,8 @@ import br.com.hidrateseplus.data.local.AppDatabase
 import br.com.hidrateseplus.data.local.LocalDataSource
 import br.com.hidrateseplus.data.remote.RemoteDataSource
 import br.com.hidrateseplus.data.repository.WaterRepository
-import br.com.hidrateseplus.util.ValidationUtils
+import br.com.hidrateseplus.app.util.ValidationUtils
+import com.google.firebase.auth.FirebaseAuth
 
 // ============================================================
 // MVVM — View (Activity)
@@ -33,14 +34,32 @@ class HomeActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setupUserGreeting()
         setupObservers()
         setupClickListeners()
     }
 
     override fun onResume() {
         super.onResume()
+
+        // Atualiza a saudação caso o usuário volte para a tela inicial
+        setupUserGreeting()
+
         // Recarrega dados quando volta da tela de configurações
         viewModel.loadData(getSavedGoal())
+    }
+
+    // ── Saudação do usuário logado ─────────────────────────────────
+
+    private fun setupUserGreeting() {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+
+        val userName = currentUser?.displayName
+            ?.takeIf { it.isNotBlank() }
+            ?: currentUser?.email?.substringBefore("@")
+            ?: "usuário"
+
+        binding.tvWelcomeUser.text = "Olá, $userName, seja bem-vindo(a)!"
     }
 
     // ── Observers: reagem a mudanças no estado da ViewModel ──────────
@@ -63,7 +82,12 @@ class HomeActivity : AppCompatActivity() {
         val safeGoal = if (state.goalMl > 0) state.goalMl else 1
 
         binding.tvTotal.text = "${state.totalMl} ml"
-        binding.tvGoal.text = if (state.goalMl > 0) "Meta diária: ${state.goalMl} ml" else "Meta diária: --"
+        binding.tvGoal.text = if (state.goalMl > 0) {
+            "Meta diária: ${state.goalMl} ml"
+        } else {
+            "Meta diária: --"
+        }
+
         binding.progressGoal.max = safeGoal
         binding.progressGoal.progress = state.totalMl.coerceAtMost(safeGoal)
 
@@ -148,7 +172,7 @@ class HomeActivity : AppCompatActivity() {
         val db = AppDatabase.getDatabase(this)
         val localDataSource = LocalDataSource(db.waterDao())
 
-        // ✅ Alterado para Firebase (sem parâmetro)
+        // Alterado para Firebase (sem parâmetro)
         val remoteDataSource = RemoteDataSource()
 
         return WaterRepository(localDataSource, remoteDataSource)
