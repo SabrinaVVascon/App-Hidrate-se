@@ -3,29 +3,30 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/space_lg"
-    android:background="@color/bg">
+    android:background="@color/bg"
+    android:padding="@dimen/space_lg">
 
     <TextView
-        android:id="@+id/tvHeader"
+        android:id="@+id/tvWelcomeUser"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Hoje"
+        android:layout_marginEnd="@dimen/space_sm"
+        android:text="Olá, seja bem-vindo(a)!"
+        android:textColor="@color/text"
         android:textSize="@dimen/text_title"
         android:textStyle="bold"
-        android:textColor="@color/text"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/topActions"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/topActions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintTop_toTopOf="@id/tvHeader"
-        app:layout_constraintBottom_toBottomOf="@id/tvHeader"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintBottom_toBottomOf="@id/tvWelcomeUser"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tvWelcomeUser">
 
         <ImageButton
             android:id="@+id/btnHistory"
@@ -35,7 +36,7 @@
             android:contentDescription="@string/history"
             android:padding="8dp"
             android:src="@drawable/ic_history"
-            android:tint="@color/brand" />
+            app:tint="@color/brand" />
 
         <ImageButton
             android:id="@+id/btnSettings"
@@ -46,7 +47,7 @@
             android:contentDescription="@string/settings"
             android:padding="8dp"
             android:src="@drawable/ic_settings"
-            android:tint="@color/brand" />
+            app:tint="@color/brand" />
     </LinearLayout>
 
     <LinearLayout
@@ -56,9 +57,9 @@
         android:layout_marginTop="@dimen/space_lg"
         android:background="@drawable/bg_card"
         android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@id/tvHeader"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/tvWelcomeUser">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -68,9 +69,9 @@
             <ImageView
                 android:layout_width="28dp"
                 android:layout_height="28dp"
+                android:contentDescription="Ícone água"
                 android:src="@drawable/ic_water"
-                android:tint="@color/brand"
-                android:contentDescription="Ícone água" />
+                app:tint="@color/brand" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -87,9 +88,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_sm"
             android:text="0 ml"
+            android:textColor="@color/text"
             android:textSize="34sp"
-            android:textStyle="bold"
-            android:textColor="@color/text" />
+            android:textStyle="bold" />
 
         <ProgressBar
             android:id="@+id/progressGoal"
@@ -99,8 +100,8 @@
             android:layout_marginTop="@dimen/space_sm"
             android:max="100"
             android:progress="0"
-            android:progressTint="@color/brand"
-            android:progressBackgroundTint="@color/brand_soft" />
+            android:progressBackgroundTint="@color/brand_soft"
+            android:progressTint="@color/brand" />
 
         <TextView
             android:id="@+id/tvGoal"
@@ -117,18 +118,18 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_lg"
-        android:orientation="vertical"
         android:background="@drawable/bg_card"
-        app:layout_constraintTop_toBottomOf="@id/cardToday"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/cardToday">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Adicionar valor (ml)"
-            android:textStyle="bold"
-            android:textColor="@color/text" />
+            android:textColor="@color/text"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -141,10 +142,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:backgroundTint="@color/brand"
                 android:hint="Ex: 180"
                 android:inputType="number"
                 android:padding="@dimen/space_md"
-                android:backgroundTint="@color/brand"
                 android:textColor="@color/text" />
 
             <Button

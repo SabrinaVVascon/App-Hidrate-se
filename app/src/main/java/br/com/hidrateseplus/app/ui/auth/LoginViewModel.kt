@@ -3,8 +3,7 @@ package br.com.hidrateseplus.app.ui.auth
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import br.com.hidrateseplus.data.remote.AuthRemoteDataSource
-import br.com.hidrateseplus.data.repository.UserRepository
+import com.google.firebase.auth.FirebaseAuth
 
 // ============================================================
 // MVVM — ViewModel da tela de Login
@@ -13,7 +12,7 @@ import br.com.hidrateseplus.data.repository.UserRepository
 // ============================================================
 class LoginViewModel : ViewModel() {
 
-    private val userRepository = UserRepository(AuthRemoteDataSource())
+    private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
 
     private val _navigateToHome = MutableLiveData<Boolean>()
     val navigateToHome: LiveData<Boolean> = _navigateToHome
@@ -22,15 +21,43 @@ class LoginViewModel : ViewModel() {
     val loginError: LiveData<String?> = _loginError
 
     fun onEnterClicked(email: String, password: String) {
-        // Por enquanto mantém navegação direta; descomente o bloco abaixo quando a API estiver pronta:
-        // viewModelScope.launch {
-        //     when (val result = userRepository.login(email, password)) {
-        //         is Result.Success -> _navigateToHome.value = true
-        //         is Result.Error -> _loginError.value = result.message
-        //         is Result.Loading -> Unit
-        //     }
-        // }
-        _navigateToHome.value = true
+        firebaseAuth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    _navigateToHome.value = true
+                } else {
+                    _loginError.value = getFriendlyErrorMessage(task.exception?.message)
+                }
+            }
+    }
+
+    private fun getFriendlyErrorMessage(errorMessage: String?): String {
+        return when {
+            errorMessage == null -> {
+                "Não foi possível realizar o login. Tente novamente."
+            }
+
+            errorMessage.contains("password", ignoreCase = true) -> {
+                "Senha incorreta. Verifique e tente novamente."
+            }
+
+            errorMessage.contains("no user record", ignoreCase = true) ||
+                    errorMessage.contains("user", ignoreCase = true) -> {
+                "Usuário não encontrado. Verifique o e-mail ou crie uma conta."
+            }
+
+            errorMessage.contains("network", ignoreCase = true) -> {
+                "Erro de conexão. Verifique sua internet e tente novamente."
+            }
+
+            errorMessage.contains("badly formatted", ignoreCase = true) -> {
+                "E-mail inválido. Use o formato nome@dominio.com."
+            }
+
+            else -> {
+                "E-mail ou senha inválidos."
+            }
+        }
     }
 
     fun onNavigationHandled() {

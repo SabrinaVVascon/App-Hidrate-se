@@ -19,7 +19,9 @@
         <activity android:name=".ui.settings.SettingsActivity" />
         <activity android:name=".ui.history.HistoryActivity" />
         <activity android:name=".ui.home.HomeActivity" />
-
+        <activity
+            android:name=".ui.auth.RegisterActivity"
+            android:exported="false" />
         <!-- Tela inicial (Launcher) -->
         <activity
             android:name=".ui.auth.LoginActivity"

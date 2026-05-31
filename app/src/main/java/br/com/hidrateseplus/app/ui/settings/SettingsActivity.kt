@@ -1,12 +1,12 @@
 package br.com.hidrateseplus.app.ui.settings
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.ArrayAdapter
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -18,7 +18,9 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import br.com.hidrateseplus.app.databinding.ActivitySettingsBinding
+import br.com.hidrateseplus.app.ui.auth.LoginActivity
 import br.com.hidrateseplus.app.worker.WaterReminderWorker
+import com.google.firebase.auth.FirebaseAuth
 import java.util.concurrent.TimeUnit
 
 // ============================================================
@@ -32,6 +34,9 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
 
     private val viewModel: SettingsViewModel by viewModels()
+
+    // Evita loop quando a tela está sendo atualizada pelo estado da ViewModel
+    private var isRenderingState = false
 
     private val notificationPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
@@ -77,19 +82,29 @@ class SettingsActivity : AppCompatActivity() {
                     finish()
                 }
 
-                null -> { /* sem evento pendente */ }
-                else -> { /* evento não tratado */ }
+                null -> {
+                    // sem evento pendente
+                }
+
+                else -> {
+                    // evento não tratado
+                }
             }
+
             if (event != null) viewModel.onEventHandled()
         }
     }
 
     private fun renderState(state: SettingsUiState) {
-        // Evita loops: só seta se diferente do que já está na tela
-        if (binding.etGoal.text.toString() != state.manualGoal)
+        isRenderingState = true
+
+        if (binding.etGoal.text.toString() != state.manualGoal) {
             binding.etGoal.setText(state.manualGoal)
-        if (binding.etWeight.text.toString() != state.weight)
+        }
+
+        if (binding.etWeight.text.toString() != state.weight) {
             binding.etWeight.setText(state.weight)
+        }
 
         binding.tvCalculatedGoal.text = state.calculatedGoalText
         binding.switchReminder.isChecked = state.remindersEnabled
@@ -99,13 +114,27 @@ class SettingsActivity : AppCompatActivity() {
         when (state.goalType) {
             SettingsViewModel.GOAL_TYPE_MANUAL -> {
                 binding.layoutManualGoal.visibility = View.VISIBLE
+                binding.layoutCalculatedGoal.visibility = View.GONE
                 binding.tvToggleManual.text = "−"
+                binding.tvToggleCalculated.text = "+"
             }
+
             SettingsViewModel.GOAL_TYPE_CALCULATED -> {
                 binding.layoutCalculatedGoal.visibility = View.VISIBLE
+                binding.layoutManualGoal.visibility = View.GONE
                 binding.tvToggleCalculated.text = "−"
+                binding.tvToggleManual.text = "+"
+            }
+
+            else -> {
+                binding.layoutManualGoal.visibility = View.GONE
+                binding.layoutCalculatedGoal.visibility = View.GONE
+                binding.tvToggleManual.text = "+"
+                binding.tvToggleCalculated.text = "+"
             }
         }
+
+        isRenderingState = false
     }
 
     // ── Click Listeners ───────────────────────────────────────
@@ -124,22 +153,62 @@ class SettingsActivity : AppCompatActivity() {
             )
         }
 
-        binding.etGoal.doAfterTextChanged { viewModel.onManualGoalChanged() }
-        binding.etWeight.doAfterTextChanged { viewModel.onWeightChanged() }
+        binding.btnLogout.setOnClickListener {
+            showLogoutConfirmation()
+        }
+
+        binding.etGoal.doAfterTextChanged { editable ->
+            if (!isRenderingState) {
+                viewModel.onManualGoalChanged(editable?.toString().orEmpty())
+            }
+        }
+
+        binding.etWeight.doAfterTextChanged { editable ->
+            if (!isRenderingState) {
+                viewModel.onWeightChanged(editable?.toString().orEmpty())
+            }
+        }
 
         binding.switchReminder.setOnCheckedChangeListener { _, isChecked ->
             binding.layoutFrequency.visibility = if (isChecked) View.VISIBLE else View.GONE
         }
     }
 
-    // ── Android APIs (permissão + WorkManager) ────────────────
-    // Ficam na Activity porque precisam de Context/lifecycle
-    // A ViewModel decide QUANDO chamar; a Activity decide COMO
+    // ── Logout ────────────────────────────────────────────────
+
+    private fun showLogoutConfirmation() {
+        AlertDialog.Builder(this)
+            .setTitle("Encerrar sessão")
+            .setMessage("Tem certeza que deseja sair da sua conta?")
+            .setPositiveButton("Sair") { _, _ ->
+                logoutUser()
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun logoutUser() {
+        FirebaseAuth.getInstance().signOut()
+
+        // Cancela lembretes agendados para evitar notificações após sair da conta
+        cancelReminderWork()
+
+        Toast.makeText(this, "Sessão encerrada", Toast.LENGTH_SHORT).show()
+
+        val intent = Intent(this, LoginActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
+    }
+
+    // ── Android APIs: permissão + WorkManager ────────────────
 
     private fun requestPermissionAndScheduleReminder(frequency: String) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+        if (
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-            != PackageManager.PERMISSION_GRANTED) {
+            != PackageManager.PERMISSION_GRANTED
+        ) {
             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         } else {
             scheduleReminderWork(frequency)
@@ -148,7 +217,12 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun scheduleReminderWork(frequency: String) {
         val minutes = viewModel.getFrequencyMinutes(frequency)
-        val workRequest = PeriodicWorkRequestBuilder<WaterReminderWorker>(minutes, TimeUnit.MINUTES).build()
+
+        val workRequest = PeriodicWorkRequestBuilder<WaterReminderWorker>(
+            minutes,
+            TimeUnit.MINUTES
+        ).build()
+
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
             WaterReminderWorker.WORK_NAME,
             ExistingPeriodicWorkPolicy.UPDATE,
@@ -165,7 +239,12 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun showOverwriteDialog(oldType: String, newValueMl: Int) {
-        val oldTypeText = if (oldType == SettingsViewModel.GOAL_TYPE_MANUAL) "manual" else "calculada"
+        val oldTypeText = if (oldType == SettingsViewModel.GOAL_TYPE_MANUAL) {
+            "manual"
+        } else {
+            "calculada"
+        }
+
         AlertDialog.Builder(this)
             .setTitle("Substituir meta atual?")
             .setMessage("A meta $oldTypeText atual será substituída por $newValueMl ml. Deseja continuar?")
@@ -185,17 +264,18 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun setupExpandableSections() {
         binding.headerCalculatedGoal.setOnClickListener {
-            toggleSection(binding.layoutCalculatedGoal, binding.tvToggleCalculated)
+            binding.layoutCalculatedGoal.visibility = View.VISIBLE
+            binding.layoutManualGoal.visibility = View.GONE
+            binding.tvToggleCalculated.text = "−"
+            binding.tvToggleManual.text = "+"
         }
-        binding.headerManualGoal.setOnClickListener {
-            toggleSection(binding.layoutManualGoal, binding.tvToggleManual)
-        }
-    }
 
-    private fun toggleSection(layout: View, toggleText: TextView) {
-        val isVisible = layout.visibility == View.VISIBLE
-        layout.visibility = if (isVisible) View.GONE else View.VISIBLE
-        toggleText.text = if (isVisible) "+" else "−"
+        binding.headerManualGoal.setOnClickListener {
+            binding.layoutManualGoal.visibility = View.VISIBLE
+            binding.layoutCalculatedGoal.visibility = View.GONE
+            binding.tvToggleManual.text = "−"
+            binding.tvToggleCalculated.text = "+"
+        }
     }
 
     private fun setupFrequencySpinner() {
@@ -204,6 +284,7 @@ class SettingsActivity : AppCompatActivity() {
             android.R.layout.simple_spinner_item,
             listOf("30 min", "1 hora", "2 horas", "3 horas")
         )
+
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerFrequency.adapter = adapter
     }

@@ -77,6 +77,22 @@
             android:text="Esqueci minha senha"
             android:textColor="@color/text_muted"
             android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tvGoToRegister"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginTop="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:minWidth="48dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="Ainda não tem conta? Clique aqui para criar"
+            android:textColor="#2196F3"
+            android:textSize="15sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

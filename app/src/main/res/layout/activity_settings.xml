@@ -2,8 +2,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:background="#F4F5F7">
+    android:background="#F4F5F7"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,45 +15,45 @@
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
             android:text="Configurações"
-            android:textSize="28sp"
-            android:textStyle="bold"
             android:textColor="#1F2937"
-            android:layout_marginBottom="24dp" />
+            android:textSize="28sp"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@android:color/white"
             android:orientation="vertical"
-            android:padding="20dp"
-            android:background="@android:color/white">
+            android:padding="20dp">
 
             <!-- META CALCULADA -->
             <LinearLayout
                 android:id="@+id/headerCalculatedGoal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_height="48dp"
                 android:gravity="center_vertical"
-                android:paddingVertical="8dp">
+                android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Meta calculada"
-                    android:textStyle="bold"
+                    android:textColor="#111827"
                     android:textSize="16sp"
-                    android:textColor="#111827" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvToggleCalculated"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:gravity="center"
                     android:text="+"
+                    android:textColor="#2563EB"
                     android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:textColor="#2563EB" />
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <LinearLayout
@@ -61,71 +61,71 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="gone"
                 android:paddingTop="8dp"
-                android:paddingBottom="16dp">
+                android:paddingBottom="16dp"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Peso (kg)"
-                    android:textStyle="bold"
+                    android:textColor="#111827"
                     android:textSize="15sp"
-                    android:textColor="#111827" />
+                    android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/etWeight"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Ex.: 60"
-                    android:inputType="numberDecimal"
+                    android:layout_height="48dp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginBottom="16dp" />
+                    android:layout_marginBottom="16dp"
+                    android:hint="Ex.: 60"
+                    android:inputType="numberDecimal" />
 
                 <Button
                     android:id="@+id/btnCalculateGoal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Calcular meta"
-                    android:layout_marginBottom="12dp" />
+                    android:layout_marginBottom="12dp"
+                    android:text="Calcular meta" />
 
                 <TextView
                     android:id="@+id/tvCalculatedGoal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Meta diária (ml): --"
+                    android:textColor="#2563EB"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="#2563EB" />
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <!-- META MANUAL -->
             <LinearLayout
                 android:id="@+id/headerManualGoal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
                 android:gravity="center_vertical"
-                android:paddingVertical="8dp"
-                android:layout_marginTop="8dp">
+                android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Meta manual"
-                    android:textStyle="bold"
+                    android:textColor="#111827"
                     android:textSize="16sp"
-                    android:textColor="#111827" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvToggleManual"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:gravity="center"
                     android:text="+"
+                    android:textColor="#2563EB"
                     android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:textColor="#2563EB" />
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <LinearLayout
@@ -133,48 +133,50 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="gone"
                 android:paddingTop="8dp"
-                android:paddingBottom="16dp">
+                android:paddingBottom="16dp"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Meta manual (ml)"
-                    android:textStyle="bold"
+                    android:textColor="#111827"
                     android:textSize="15sp"
-                    android:textColor="#111827" />
+                    android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/etGoal"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="8dp"
                     android:hint="Ex.: 2000"
-                    android:inputType="number"
-                    android:layout_marginTop="8dp" />
+                    android:inputType="number" />
             </LinearLayout>
 
             <!-- LEMBRETES -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
+                android:layout_height="48dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Receber lembretes"
-                    android:textSize="16sp"
-                    android:textColor="#111827" />
+                    android:textColor="#111827"
+                    android:textSize="16sp" />
 
                 <Switch
                     android:id="@+id/switchReminder"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:minWidth="48dp"
+                    android:minHeight="48dp" />
             </LinearLayout>
 
             <LinearLayout
@@ -187,16 +189,16 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
                     android:text="Frequência dos lembretes"
-                    android:textStyle="bold"
-                    android:textSize="15sp"
                     android:textColor="#111827"
-                    android:layout_marginBottom="8dp" />
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
 
                 <Spinner
                     android:id="@+id/spinnerFrequency"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     android:layout_marginBottom="24dp" />
             </LinearLayout>
 
@@ -206,6 +208,18 @@
                 android:layout_height="wrap_content"
                 android:text="Salvar" />
 
+            <Button
+                android:id="@+id/btnLogout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="#EF4444"
+                android:text="Encerrar sessão"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF" />
+
         </LinearLayout>
+
     </LinearLayout>
+
 </ScrollView>

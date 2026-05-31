@@ -54,6 +54,11 @@ class LoginActivity : AppCompatActivity() {
             val password = binding.etPassword.text.toString()
             viewModel.onEnterClicked(email, password)
         }
+
+        binding.tvGoToRegister.setOnClickListener {
+            val intent = Intent(this, RegisterActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun validateLoginFields(): Boolean {
