@@ -83,12 +83,19 @@ class RegisterActivity : AppCompatActivity() {
                 if (task.isSuccessful) {
                     saveUserName(name)
                 } else {
-                    binding.btnCreateAccount.isEnabled = true
-                    binding.btnCreateAccount.text = "Criar conta"
+            binding.btnCreateAccount.isEnabled = true
+            binding.btnCreateAccount.text = "Criar conta"
 
-                    val errorMessage = task.exception?.message ?: "Não foi possível criar a conta"
-                    Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
-                }
+            val errorCode = (task.exception as? com.google.firebase.auth.FirebaseAuthException)?.errorCode
+            val errorMessage = when (errorCode) {
+                "ERROR_INVALID_EMAIL"        -> "O endereço de e-mail está mal formatado."
+                "ERROR_EMAIL_ALREADY_IN_USE" -> "Este e-mail já está em uso."
+                "ERROR_WEAK_PASSWORD"        -> "A senha deve ter pelo menos 6 caracteres."
+                "ERROR_NETWORK_REQUEST_FAILED" -> "Erro de conexão. Verifique sua internet."
+                else -> "Não foi possível criar a conta. Tente novamente."
+            }
+            Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
+        }
             }
     }
 
